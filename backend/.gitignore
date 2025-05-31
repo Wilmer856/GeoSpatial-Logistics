@@ -1,0 +1,16 @@
+#Python
+*.pyc
+__pycache__/
+*.egg-info
+*.log
+
+# Virtual environment
+env/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.pyproj
+
+# Other
