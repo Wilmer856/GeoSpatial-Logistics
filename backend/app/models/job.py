@@ -12,12 +12,18 @@ class JobIn(BaseModel):
 
 # Sub Model of JobIn that gets created after running optimization logic
 class JobOut(JobIn):
-    eta_minutes: Optional[int] = 0
-    route_position: Optional[int] = None # position in route queue e.g. 1st stop, 2nd stop, etc
-    distance_from_prev_km = Optional[float] = 0.0
+    eta_minutes: int
+    route_position: int # position in route queue e.g. 1st stop, 2nd stop, etc
+    distance_from_prev_km: float = 0.0
+    cumulative_distance_km:float = 0.0
     
 class RouteSummary(BaseModel):
-    total_distane_km: float
+    total_distance_km: float
     estimated_total_time_min: int
+    path: list[list[float]]
+
+class WarehouseLocation(BaseModel):
+    latitude: float
+    longitude: float
 
     
