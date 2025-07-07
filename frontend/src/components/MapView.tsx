@@ -97,7 +97,7 @@ export default function MapView({ warehouse }: MapViewProps) {
         }
 
         console.log("Polyline path:", data.summary);
-        console.log(data.route)
+        console.log(data.route);
 
         setJobs(data.route);
         setSummary(data.summary);
@@ -132,28 +132,30 @@ export default function MapView({ warehouse }: MapViewProps) {
       >
         <Popup>Warehouse</Popup>
       </Marker>
-      {jobs.map((job, index) => (
-        <Marker
-          key={job.id}
-          position={[job.latitude, job.longitude]}
-          icon={
-            new Icon({
-              iconUrl: markerIconPng.src,
-              shadowUrl: shaodwMarkerPng.src,
-              iconSize: [25, 41],
-              iconAnchor: [12, 41],
-            })
-          }
-        >
-          <Popup>
-            <strong>{job.id}</strong>
-            <br />
-            Stop # {job.route_position}
-            <br />
-            ETA: {job.eta_minutes} min
-          </Popup>
-        </Marker>
-      ))}
+      {jobs
+        .sort((a, b) => a.route_position - b.route_position)
+        .map((job, index) => (
+          <Marker
+            key={job.id}
+            position={[job.latitude, job.longitude]}
+            icon={
+              new Icon({
+                iconUrl: markerIconPng.src,
+                shadowUrl: shaodwMarkerPng.src,
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+              })
+            }
+          >
+            <Popup>
+              <strong>{job.id}</strong>
+              <br />
+              Stop # {job.route_position}
+              <br />
+              ETA: {job.eta_minutes} min
+            </Popup>
+          </Marker>
+        ))}
       {summary && summary.path && (
         <Polyline
           positions={summary.path.map(([lon, lat]: GeoJsonCoord) => [lat, lon])}
