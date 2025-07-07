@@ -11,13 +11,16 @@ from io import StringIO
 
 router = APIRouter()
 
+
 class WarehouseLocation(BaseModel):
     latitude: float
     longitude: float
 
+
 class OptimizeRequest(BaseModel):
     warehouse: WarehouseLocation
     jobs: List[JobIn]
+
 
 @router.post("/optimize", response_model=Dict[str, Union[List[JobOut], RouteSummary]])
 async def optimize(request: OptimizeRequest):
@@ -28,16 +31,21 @@ async def optimize(request: OptimizeRequest):
         print(f"warehouse: {request.warehouse} ({type(request.warehouse)})")
         print(f"jobs: {request.jobs} ({[type(j) for j in request.jobs]})")
 
-        enriched_jobs, route_summary = route_with_ors(request.jobs, request.warehouse)
+        enriched_jobs, route_summary = route_with_ors(
+            request.jobs, request.warehouse)
+
+        # print("Enriched jobs: " + enriched_jobs)
+        # print("Route Summary: " + enriched_jobs)
         return {
             "route": enriched_jobs,
             "summary": route_summary
         }
-        
 
     except Exception as e:
+
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
 @router.post("/optimize/from-csv", response_model=Dict[str, Union[List[JobOut], RouteSummary]])
 async def optimize_from_csv(file: UploadFile = File(), lat: float = None, lon: float = None):
     try:
@@ -57,26 +65,28 @@ async def optimize_from_csv(file: UploadFile = File(), lat: float = None, lon: f
                 )
                 jobs.append(job)
             except Exception as e:
-                raise HTTPException(status_code=400, detail=f"Invalid row format: {row}, error: {e}")
-            
+                raise HTTPException(
+                    status_code=400, detail=f"Invalid row format: {row}, error: {e}")
+
         if not jobs:
             raise HTTPException(status_code=400, detail="CSV contains no jobs")
-        
+
         enriched_jobs, summary = route_with_ors(jobs, (lat, lon))
         return {
             "route": enriched_jobs,
             "summary": summary
         }
-         
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/export/route-csv")
 def export_route_csv(jobs: List[JobIn]):
     try:
         if not jobs:
             raise HTTPException(status_code=400, detail="No jobs provided")
-        
+
         enriched_jobs, summary = route_with_ors(jobs, (lat, lon))
 
         # Build csv
@@ -101,14 +111,15 @@ def export_route_csv(jobs: List[JobIn]):
             ])
         writer.writerow([])
         writer.writerow(["Total Distance (km)", summary.total_distane_km])
-        writer.writerow(["Estimated Time (min)", summary.estimated_total_time_min])
+        writer.writerow(
+            ["Estimated Time (min)", summary.estimated_total_time_min])
 
         buffer.seek(0)
-        return(StreamingResponse(
+        return (StreamingResponse(
             buffer,
             media_type="text/csv",
-            headers={"Content-Disposition": "attachment; filename=optimized_route.csv"}
+            headers={
+                "Content-Disposition": "attachment; filename=optimized_route.csv"}
         ))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
