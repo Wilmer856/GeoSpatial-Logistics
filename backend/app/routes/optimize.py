@@ -3,27 +3,35 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse, StreamingResponse
 from typing import List, Union, Dict
+from pydantic import BaseModel
 from app.models.job import JobIn, JobOut, RouteSummary
-from utils.algorithm import nearest_neighbor_optimized
+from app.utils.algorithm import route_with_ors
 import csv
 from io import StringIO
 
 router = APIRouter()
 
+class WarehouseLocation(BaseModel):
+    latitude: float
+    longitude: float
+
+class OptimizeRequest(BaseModel):
+    warehouse: WarehouseLocation
+    jobs: List[JobIn]
+
 @router.post("/optimize", response_model=Dict[str, Union[List[JobOut], RouteSummary]])
-def optimize(jobs: list[JobIn]):
+async def optimize(request: OptimizeRequest):
     try:
-        if not jobs:
+        if not request.jobs:
             raise HTTPException(status_code=400, detail="No jobs provided")
 
-        optimized_jobs = nearest_neighbor_optimized(jobs)
-        summary = RouteSummary(
-            total_distance_km=optimized_jobs[-1].cumulative_distance_km,
-            estimated_total_time_min=optimized_jobs[-1].eta_minutes
-        )
+        print(f"warehouse: {request.warehouse} ({type(request.warehouse)})")
+        print(f"jobs: {request.jobs} ({[type(j) for j in request.jobs]})")
+
+        enriched_jobs, route_summary = route_with_ors(request.jobs, request.warehouse)
         return {
-            "route": optimized_jobs,
-            "summary": summary
+            "route": enriched_jobs,
+            "summary": route_summary
         }
         
 
@@ -31,7 +39,7 @@ def optimize(jobs: list[JobIn]):
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.post("/optimize/from-csv", response_model=Dict[str, Union[List[JobOut], RouteSummary]])
-async def optimize_from_csv(file: UploadFile = File()):
+async def optimize_from_csv(file: UploadFile = File(), lat: float = None, lon: float = None):
     try:
         contents = await file.read()
         decoded = contents.decode("utf-8")
@@ -54,17 +62,12 @@ async def optimize_from_csv(file: UploadFile = File()):
         if not jobs:
             raise HTTPException(status_code=400, detail="CSV contains no jobs")
         
-        optimized_jobs = nearest_neighbor_optimized(jobs)
-        summary = RouteSummary(
-            total_distance_km=optimized_jobs[-1].cumulative_distance_km,
-            estimated_total_time_min=optimized_jobs[-1].eta_minutes
-        )
-
+        enriched_jobs, summary = route_with_ors(jobs, (lat, lon))
         return {
-            "route": optimized_jobs,
+            "route": enriched_jobs,
             "summary": summary
         }
-        
+         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -74,21 +77,17 @@ def export_route_csv(jobs: List[JobIn]):
         if not jobs:
             raise HTTPException(status_code=400, detail="No jobs provided")
         
-        optimized_jobs = nearest_neighbor_optimized(jobs)
-        summary = RouteSummary(
-            total_distance_km=optimized_jobs[-1].cumulative_distance_km,
-            estimated_total_time_min=optimized_jobs[-1].eta_minutes
-        )
+        enriched_jobs, summary = route_with_ors(jobs, (lat, lon))
 
         # Build csv
         buffer = StringIO()
         writer = csv.writer(buffer)
         writer.writerow([
             "id", "latitude", "longitude", "priority", "estimated_time",
-            "route_position", "distance_from_prev_km", "cumulative_distance_from_kmn","eta_minutes"
+            "route_position", "distance_from_prev_km", "cumulative_distance_km", "eta_minutes"
         ])
 
-        for job in optimized_jobs:
+        for job in enriched_jobs:
             writer.writerow([
                 job.id,
                 job.latitude,
