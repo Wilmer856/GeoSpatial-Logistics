@@ -7,8 +7,11 @@ const warehouse: LatLngExpression = [40.721786, -73.999384];
 
 export default function Home() {
   return (
-    <main className="p-6 space-y-6">
-      <ActionsPanel />
+    <main className="h-screen p-6 space-y-6 bg-base-200 text-base-content">
+      <div className="w-full flex gap-4 items-center">
+        <span className="text-lg font-semibold">Warehouse: lat,lon</span>
+        <ActionsPanel />
+      </div>
       <div className="flex w-full gap-4">
         <div className="card bg-base-300 rounded-box grid">
           <div className="join join-vertical gap-4 p-2">
@@ -39,14 +42,20 @@ export default function Home() {
           <MapView warehouse={warehouse} />
         </div>
       </div>
-      <div className="stats shadow">
-        <div className="stat">
-          <div className="stat-title">Distance</div>
-          <div className="stat-value">19.4 KM</div>
-        </div>
-        <div className="stat">
-          <div className="stat-title">ETA</div>
-          <div className="stat-value">44 min</div>
+      <div className="w-full">
+        <div className="stats shadow">
+          <div className="stat">
+            <div className="stat-title">Distance</div>
+            <div className="stat-value">19.4 KM</div>
+          </div>
+          <div className="stat">
+            <div className="stat-title">ETA</div>
+            <div className="stat-value">44 min</div>
+          </div>
+          <div className="stat">
+            <div className="stat-title">Stops</div>
+            <div className="stat-value">10</div>
+          </div>
         </div>
       </div>
     </main>
