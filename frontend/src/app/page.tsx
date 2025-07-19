@@ -3,6 +3,7 @@
 import MapView from "@/components/MapView";
 import ActionsPanel from "@/components/ActionsPanel";
 import WarehouseModal from "@/components/WarehouseModal";
+import SummaryCard from "@/components/SummaryCard";
 import { useState, useEffect } from "react";
 import JobListSidebar from "@/components/JobListSidebar";
 import { JobIn, JobOut, RouteSummary, Warehouse } from "@/types/jobs";
@@ -236,6 +237,9 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-3">
+              <SummaryCard routeSummary={routeSummary} jobCount={jobs.length} />
+            </div>
             <div className="lg:col-span-3">
               <MapView
                 warehouse={[warehouse.latitude, warehouse.longitude]}
