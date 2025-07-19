@@ -80,8 +80,8 @@ export default function WarehouseModal({
 
   const handleAddressSelect = (suggestion: GeocodingResult) => {
     setAddress(suggestion.display_name || suggestion.address);
-    setShowSuggestions(false);
     setAddressSuggestions([]);
+    setShowSuggestions(false);
   };
 
   // Handle click outside to close suggestions
@@ -95,12 +95,11 @@ export default function WarehouseModal({
       }
     };
 
-    if (showSuggestions) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [showSuggestions]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Handle escape key to close suggestions
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -110,8 +109,6 @@ export default function WarehouseModal({
   };
 
   const handleCancel = () => {
-    setAddress(currentWarehouse.address || "");
-    setShowSuggestions(false);
     onClose();
   };
 

@@ -1,32 +1,118 @@
-🚚 Project Overview: Routify Route Optimizer
-Routify is a web-based route optimization tool for small delivery operations and field service teams. The main goal is to make delivery planning fast and easy, allowing a user to enter multiple job addresses, optimize the route, and visualize everything on an interactive map.
+# Routify - Route Optimization Tool
 
-Key Features
-Warehouse Selection: The user sets a warehouse (starting location) on the map.
+A web-based route optimization platform for delivery operations and field service teams. Enter job addresses, optimize routes, and visualize everything on an interactive map.
 
-Add Jobs/Deliveries: Users can input jobs by address (using geocoding to get coordinates) or upload a CSV of jobs.
+## Features
 
-Route Optimization: The backend uses OpenRouteService (ORS) to calculate the most efficient driving route visiting all stops.
+### Warehouse Management
 
-Visual Map: Markers and polylines display the optimized route and stops.
+- Set warehouse locations with address autocomplete
+- Visual warehouse markers on maps
+- Persistent warehouse settings
 
-Details Panel: Sidebar/card displays stop order, ETA, job info, total route stats (distance, time, # stops).
+### Job Management
 
-Themeable UI: Modern, responsive look using Tailwind + DaisyUI.
+- Add delivery jobs using addresses (no coordinates needed)
+- Address autocomplete with LocationIQ and Nominatim geocoding
+- Priority levels and estimated delivery times
+- Edit and delete jobs
 
-Intended Users
-Local businesses, dispatchers, or anyone who needs to optimize daily routes for multiple jobs (delivery, service, etc.).
+### Route Optimization
 
-Possible Future Expansions
-CSV import/export for batch jobs.
+- Uses OpenRouteService for driving routes
+- Automatic waypoint optimization
+- Real-time ETAs and distance calculations
+- Visual route display with polylines and markers
 
-Address autocomplete.
+### Data Management
 
-Multiple vehicle support.
+- CSV import/export for bulk job management
+- Downloadable optimized route reports
+- Template generation for data entry
 
-Job priorities and time windows.
+### UI/UX
 
-User authentication and saving routes.
+- Responsive design (mobile-first)
+- Clean interface with DaisyUI components
+- Real-time route visualization with Leaflet maps
+- Touch-friendly controls for mobile
 
-Current Focus:
-Core route optimization (markers, lines, ETAs) and simple UI. Not a full logistics management platform—just a clean, focused tool to optimize and visualize routes.
+## GIS & Spatial Data Features
+
+### Geocoding & Coordinate Systems
+
+- Address-to-coordinate conversion using WGS84 coordinate system
+- Reverse geocoding to convert coordinates back to addresses
+- Multi-source geocoding with LocationIQ and Nominatim APIs
+- Spatial data validation for geographic bounds
+
+### Spatial Analysis & Optimization
+
+- Traveling salesman problem solving with OpenRouteService
+- Distance calculations using Haversine formula
+- Route geometry with polyline encoding/decoding
+- Spatial indexing for large datasets
+
+### Interactive Mapping
+
+- Web Mercator projection for web mapping
+- Tile-based rendering with OpenStreetMap tiles
+- Spatial markers for warehouses, delivery points, and route stops
+- Real-time geospatial updates during route optimization
+
+## Tech Stack
+
+### Frontend
+
+- Next.js 15 with React 18
+- TypeScript
+- Tailwind CSS 4 + DaisyUI 5
+- Leaflet + React-Leaflet for maps
+- LocationIQ and Nominatim for geocoding
+
+### Backend
+
+- FastAPI (Python)
+- OpenRouteService for route optimization
+- Pydantic for data models
+- OpenRouteService Python client for spatial operations
+
+## Live Demo
+
+Key features to try:
+
+1. Smart address input with instant autocomplete
+2. Visual route planning with map optimization
+3. Mobile responsive design
+4. CSV import/export for bulk operations
+
+## Mobile-First Design
+
+Built for mobile users:
+
+- Touch-friendly controls and buttons
+- Responsive map interactions
+- Optimized form inputs for mobile keyboards
+- Adaptive layouts for all screen sizes
+
+## API Integration
+
+RESTful API with route optimization:
+
+```json
+POST /optimize
+{
+  "warehouse": { "latitude": 40.7128, "longitude": -74.0060 },
+  "jobs": [
+    {
+      "address": "123 Main St, New York, NY",
+      "priority": "high",
+      "estimated_time": "30"
+    }
+  ]
+}
+```
+
+Returns optimized route order, ETAs, and total distance/duration.
+
+---

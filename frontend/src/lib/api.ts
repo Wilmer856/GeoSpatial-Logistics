@@ -1,23 +1,23 @@
 import { GeocodingResult } from "@/types/jobs";
 
-// LocationIQ API token - get free account at locationiq.com (5,000 requests/day, no credit card)
+// LocationIQ token from environment
 const LOCATIONIQ_TOKEN = process.env.NEXT_PUBLIC_LOCATIONIQ_TOKEN || "";
 
-// Primary geocoding - tries LocationIQ first, then falls back to Nominatim
+// Main geocoding function - tries LocationIQ, falls back to Nominatim
 export async function geocodeAddress(
   address: string
 ): Promise<GeocodingResult | null> {
-  // Try LocationIQ first (good accuracy, 5k free/day, no credit card)
+  // Try LocationIQ first
   if (LOCATIONIQ_TOKEN) {
     const result = await geocodeWithLocationIQ(address);
     if (result) return result;
   }
 
-  // Fallback to Nominatim (free but limited)
+  // Fallback to Nominatim
   return await geocodeAddressNominatim(address);
 }
 
-// Address autocomplete - tries LocationIQ first, then Nominatim
+// Address autocomplete - tries LocationIQ, falls back to Nominatim
 export async function getAddressSuggestions(
   query: string
 ): Promise<GeocodingResult[]> {
@@ -33,7 +33,7 @@ export async function getAddressSuggestions(
   return await getAddressSuggestionsNominatim(query);
 }
 
-// LocationIQ implementation (enhanced Nominatim with better house numbers)
+// LocationIQ geocoding implementation
 async function geocodeWithLocationIQ(
   address: string
 ): Promise<GeocodingResult | null> {
@@ -87,7 +87,7 @@ async function getLocationIQSuggestions(
   return [];
 }
 
-// Nominatim fallback (completely free but limited accuracy)
+// Nominatim fallback geocoding
 async function geocodeAddressNominatim(
   address: string
 ): Promise<GeocodingResult | null> {
@@ -149,7 +149,7 @@ async function getAddressSuggestionsNominatim(
   }
 }
 
-// Reverse geocoding - convert coordinates to address
+// Convert coordinates back to address
 export async function reverseGeocode(
   lat: number,
   lng: number

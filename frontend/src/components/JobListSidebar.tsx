@@ -71,38 +71,25 @@ export default function JobListSidebar({
     e.preventDefault();
 
     // Basic validation
-    if (
-      !formData.id.trim() ||
-      !formData.address.trim() ||
-      !formData.estimated_time
-    ) {
-      alert("Please fill in all fields");
-      return;
-    }
-
-    const estimatedTime = parseInt(formData.estimated_time);
-    if (isNaN(estimatedTime) || estimatedTime < 1) {
-      alert("Please enter a valid estimated time");
+    if (!formData.id.trim() || !formData.address.trim()) {
+      alert("Please fill in all required fields.");
       return;
     }
 
     // Check for duplicate IDs
-    if (jobs.some((job) => job.id === formData.id.trim())) {
-      alert("Job ID already exists. Please use a unique ID.");
-      return;
+    const existingJob = jobs.find((job) => job.id === formData.id.trim());
+    if (existingJob) {
+      const shouldReplace = confirm(
+        `Job with ID "${formData.id}" already exists. Do you want to replace it?`
+      );
+      if (!shouldReplace) return;
     }
-
-    setIsGeocoding(true);
 
     try {
       // Geocode the address
       const geocodeResult = await geocodeAddress(formData.address.trim());
-
       if (!geocodeResult) {
-        alert(
-          "Could not find coordinates for this address. Please try a more specific address or check the spelling."
-        );
-        setIsGeocoding(false);
+        alert("Could not find the address. Please check and try again.");
         return;
       }
 
@@ -112,7 +99,7 @@ export default function JobListSidebar({
         latitude: geocodeResult.latitude,
         longitude: geocodeResult.longitude,
         priority: formData.priority,
-        estimated_time: estimatedTime,
+        estimated_time: parseInt(formData.estimated_time) || 0,
       };
 
       onAddJob(newJob);
@@ -124,14 +111,10 @@ export default function JobListSidebar({
         priority: "medium",
         estimated_time: "",
       });
-
-      setShowSuggestions(false);
       onShowAddJobForm(false);
     } catch (error) {
-      alert("Error adding job. Please try again.");
       console.error("Error adding job:", error);
-    } finally {
-      setIsGeocoding(false);
+      alert("Failed to add job. Please try again.");
     }
   };
 
@@ -155,12 +138,11 @@ export default function JobListSidebar({
       }
     };
 
-    if (showSuggestions) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [showSuggestions]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Handle escape key to close suggestions
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -181,10 +163,7 @@ export default function JobListSidebar({
   };
 
   // Use optimized jobs for display if available, otherwise use regular jobs
-  const jobsToDisplay =
-    optimizedJobs.length > 0
-      ? optimizedJobs.sort((a, b) => a.route_position - b.route_position)
-      : jobs;
+  const jobsToDisplay = optimizedJobs.length > 0 ? optimizedJobs : jobs;
 
   return (
     <div className="bg-base-100 border-r border-base-300 h-screen lg:max-h-screen overflow-y-auto">

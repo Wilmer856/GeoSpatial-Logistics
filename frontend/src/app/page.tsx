@@ -8,7 +8,7 @@ import JobListSidebar from "@/components/JobListSidebar";
 import { JobIn, JobOut, RouteSummary, Warehouse } from "@/types/jobs";
 import { reverseGeocode } from "@/lib/api";
 
-// Default warehouse (NYC) - will be replaced by user selection
+// Default warehouse location (NYC)
 const defaultWarehouse: Warehouse = {
   address: "",
   latitude: 40.721786,
@@ -25,7 +25,7 @@ export default function Home() {
   const [showWarehouseModal, setShowWarehouseModal] = useState(false);
   const [warehouseAddress, setWarehouseAddress] = useState<string>("");
 
-  // Load warehouse from localStorage and get address on component
+  // Load warehouse from localStorage and get address
   useEffect(() => {
     const loadWarehouse = async () => {
       try {

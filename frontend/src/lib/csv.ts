@@ -16,7 +16,7 @@ export interface CSVJobRow {
   estimated_time: string;
 }
 
-// Parse uploaded CSV file and convert to jobs
+// Parse CSV file and convert to jobs
 export async function parseCSVFile(file: File): Promise<CSVParseResult> {
   const result: CSVParseResult = {
     jobs: [],
@@ -209,39 +209,33 @@ export function generateOptimizedRouteCSV(
 
   const csvContent = [
     // Warehouse info
-    `"Warehouse Information"`,
-    `"Address","${warehouse.address || ""}"`,
-    `"Latitude","${warehouse.latitude}"`,
-    `"Longitude","${warehouse.longitude}"`,
+    `"Warehouse: ${warehouse.address}"`,
+    `"Latitude: ${warehouse.latitude}"`,
+    `"Longitude: ${warehouse.longitude}"`,
     `""`, // Empty line
-
     // Route summary
     `"Route Summary"`,
-    `"Total Distance (km)","${summary.total_distance_km}"`,
-    `"Total Time (minutes)","${summary.estimated_total_time_min}"`,
-    `"Number of Stops","${jobs.length}"`,
+    `"Total Distance: ${summary.total_distance_km.toFixed(2)} km"`,
+    `"Total Duration: ${summary.estimated_total_time_min} minutes"`,
+    `"Total Stops: ${jobs.length}"`,
     `""`, // Empty line
-
     // Headers for optimized jobs
     headers.join(","),
-
     // Optimized jobs data
-    ...jobs
-      .sort((a, b) => a.route_position - b.route_position)
-      .map((job) =>
-        [
-          job.route_position.toString(),
-          `"${job.id}"`,
-          `"${job.address || ""}"`,
-          job.latitude.toString(),
-          job.longitude.toString(),
-          `"${job.priority}"`,
-          job.estimated_time.toString(),
-          job.eta_minutes.toString(),
-          job.distance_from_prev_km.toString(),
-          job.cumulative_distance_km.toString(),
-        ].join(",")
-      ),
+    ...jobs.map((job) =>
+      [
+        job.route_position.toString(),
+        `"${job.id}"`,
+        `"${job.address || ""}"`,
+        job.latitude.toString(),
+        job.longitude.toString(),
+        `"${job.priority}"`,
+        job.estimated_time.toString(),
+        job.eta_minutes.toString(),
+        job.distance_from_prev_km.toFixed(2),
+        job.cumulative_distance_km.toFixed(2),
+      ].join(",")
+    ),
   ].join("\n");
 
   return csvContent;
@@ -249,34 +243,35 @@ export function generateOptimizedRouteCSV(
 
 // Generate CSV template for users
 export function generateCSVTemplate(): string {
-  const headers = ["id", "address", "priority", "estimated_time"];
-  const exampleData = [
-    ["delivery-001", "123 Main St, New York, NY 10001", "high", "15"],
-    ["delivery-002", "Central Park, New York, NY", "medium", "20"],
-    ["delivery-003", "Times Square, New York, NY", "low", "10"],
+  const headers = [
+    "id",
+    "address",
+    "latitude",
+    "longitude",
+    "priority",
+    "estimated_time",
+  ];
+  const exampleRow = [
+    "job-1",
+    "123 Main St, New York, NY",
+    "40.7589",
+    "-73.9851",
+    "high",
+    "30",
   ];
 
-  const csvContent = [
-    headers.join(","),
-    ...exampleData.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-  ].join("\n");
-
-  return csvContent;
+  return [headers.join(","), exampleRow.join(",")].join("\n");
 }
 
 // Download helper function
 export function downloadCSV(content: string, filename: string): void {
-  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([content], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-
-  if (link.download !== undefined) {
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", filename);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
