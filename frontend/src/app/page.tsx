@@ -9,11 +9,11 @@ import JobListSidebar from "@/components/JobListSidebar";
 import { JobIn, JobOut, RouteSummary, Warehouse } from "@/types/jobs";
 import { reverseGeocode } from "@/lib/api";
 
-// Default warehouse location (NYC)
+// Default warehouse location (Philadelphia, PA)
 const defaultWarehouse: Warehouse = {
   address: "",
-  latitude: 40.721786,
-  longitude: -73.999384,
+  latitude: 39.9533727,
+  longitude: -75.165577,
 };
 
 export default function Home() {

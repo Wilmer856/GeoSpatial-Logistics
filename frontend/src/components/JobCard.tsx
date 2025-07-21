@@ -84,7 +84,7 @@ export default function JobCard({
                 Stop #{optimizedJob.route_position}
               </div>
             )}
-            <h3 className="font-semibold text-base sm:text-lg truncate">
+            <h3 className="font-semibold text-base-content sm:text-lg truncate">
               {job.id}
             </h3>
             <p className="text-sm text-base-content/70 line-clamp-2 sm:line-clamp-1">
@@ -111,7 +111,7 @@ export default function JobCard({
           <div className="flex flex-col sm:flex-row gap-1">
             <button
               onClick={() => setIsEditing(true)}
-              className="btn btn-ghost btn-xs sm:btn-sm"
+              className="btn btn-primary btn-xs sm:btn-sm"
               title="Edit job"
             >
               <svg
@@ -132,7 +132,7 @@ export default function JobCard({
             </button>
             <button
               onClick={() => onDelete(job.id)}
-              className="btn btn-ghost btn-xs sm:btn-sm btn-error"
+              className="btn btn-xs sm:btn-sm btn-error"
               title="Delete job"
             >
               <svg

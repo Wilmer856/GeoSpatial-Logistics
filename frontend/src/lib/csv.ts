@@ -54,9 +54,7 @@ export async function parseCSVFile(file: File): Promise<CSVParseResult> {
 
     // Parse data rows
     for (let i = 1; i < lines.length; i++) {
-      const rowData = lines[i]
-        .split(",")
-        .map((cell) => cell.trim().replace(/"/g, ""));
+      const rowData = parseCSVLine(lines[i]);
       const row: Record<string, string> = {};
 
       header.forEach((col, index) => {
@@ -89,6 +87,29 @@ export async function parseCSVFile(file: File): Promise<CSVParseResult> {
   }
 
   return result;
+}
+
+// Parse CSV line with proper quote handling
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === "," && !inQuotes) {
+      result.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  result.push(current.trim());
+  return result.map((cell) => cell.replace(/^"|"$/g, "")); // Remove outer quotes
 }
 
 async function parseCSVRow(

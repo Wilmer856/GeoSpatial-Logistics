@@ -2,6 +2,8 @@
 
 A web-based route optimization platform for delivery operations and field service teams. Enter job addresses, optimize routes, and visualize everything on an interactive map.
 
+![Routify Screenshot](./Routify.PNG)
+
 ## Features
 
 ### Warehouse Management
@@ -76,15 +78,6 @@ A web-based route optimization platform for delivery operations and field servic
 - OpenRouteService for route optimization
 - Pydantic for data models
 - OpenRouteService Python client for spatial operations
-
-## Live Demo
-
-Key features to try:
-
-1. Smart address input with instant autocomplete
-2. Visual route planning with map optimization
-3. Mobile responsive design
-4. CSV import/export for bulk operations
 
 ## Mobile-First Design
 
